@@ -1,0 +1,107 @@
+.pagina-login {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.panel-marca {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem;
+  color: #fff;
+  background:
+    radial-gradient(circle at 20% 20%, rgb(255 255 255 / 0.12), transparent 40%),
+    linear-gradient(135deg, #1e3a8a, #0f172a);
+
+  h2 {
+    font-size: clamp(1.6rem, 3vw, 2.25rem);
+    max-width: 18ch;
+  }
+
+  p {
+    opacity: 0.8;
+    max-width: 36ch;
+  }
+
+  small {
+    opacity: 0.6;
+  }
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 8px;
+  background: #fff;
+  color: #1e3a8a;
+}
+
+.zona-formulario {
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+}
+
+.tarjeta-login {
+  width: 100%;
+  max-width: 400px;
+}
+
+.con-accion {
+  position: relative;
+
+  .entrada {
+    padding-right: 4.5rem;
+  }
+
+  .ver {
+    position: absolute;
+    right: 0.4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: none;
+    color: var(--primario);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+.demo {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--borde);
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  text-align: center;
+
+  &__botones {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .pagina-login {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-marca {
+    display: none;
+  }
+}

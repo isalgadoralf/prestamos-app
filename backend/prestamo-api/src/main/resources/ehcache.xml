@@ -1,0 +1,21 @@
+<config xmlns="http://www.ehcache.org/v3">
+
+    <cache alias="prestamoPorIdCache">
+        <expiry>
+            <ttl unit="seconds">30</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">100</heap>
+        </resources>
+    </cache>
+
+    <cache alias="prestamosUsuarioCache">
+        <expiry>
+            <ttl unit="seconds">30</ttl>
+        </expiry>
+        <resources>
+            <heap unit="entries">100</heap>
+        </resources>
+    </cache>
+
+</config>

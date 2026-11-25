@@ -1,0 +1,160 @@
+<app-barra-superior prefijo="Bienvenido" />
+
+<main class="contenedor">
+  <section class="metricas" aria-label="Resumen de mis préstamos">
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Pendientes</div>
+      <div class="valor">{{ resumen().PENDIENTE }}</div>
+    </div>
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Aprobados</div>
+      <div class="valor">{{ resumen().APROBADO }}</div>
+    </div>
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Rechazados</div>
+      <div class="valor">{{ resumen().RECHAZADO }}</div>
+    </div>
+  </section>
+
+  <div class="rejilla">
+    <section class="tarjeta">
+      <h2 class="tarjeta__titulo">Solicitar préstamo</h2>
+      <p class="tarjeta__subtitulo">Indique el monto y el plazo que desea solicitar</p>
+
+      @if (mensajeError()) {
+        <div class="alerta alerta--error" role="alert">{{ mensajeError() }}</div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        <div class="campo">
+          <label for="monto">Monto</label>
+          <div class="entrada-con-prefijo">
+            <span class="prefijo">$</span>
+            <input
+              id="monto"
+              class="entrada"
+              type="number"
+              inputmode="decimal"
+              formControlName="monto"
+              placeholder="0"
+              min="1"
+              step="0.01"
+              [attr.aria-invalid]="monto.invalid && monto.touched"
+            />
+          </div>
+          @if (monto.invalid && monto.touched) {
+            <span class="error-campo">
+              @if (monto.hasError('required')) {
+                El monto es obligatorio
+              } @else if (monto.hasError('min')) {
+                El monto debe ser mayor a cero
+              } @else if (monto.hasError('max')) {
+                El monto máximo es {{ montoMaximo | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}
+              } @else {
+                Use como máximo 2 decimales
+              }
+            </span>
+          } @else if (monto.value) {
+            <span class="ayuda">{{ monto.value | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</span>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="plazoMeses">Plazo (meses)</label>
+          <input
+            id="plazoMeses"
+            class="entrada"
+            type="number"
+            inputmode="numeric"
+            formControlName="plazoMeses"
+            placeholder="Ej. 12"
+            min="1"
+            [max]="plazoMaximo"
+            [attr.aria-invalid]="plazoMeses.invalid && plazoMeses.touched"
+          />
+          <div class="chips" role="group" aria-label="Plazos sugeridos">
+            @for (meses of plazosSugeridos; track meses) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--activo]="plazoMeses.value === meses"
+                (click)="elegirPlazo(meses)"
+              >
+                {{ meses }} m
+              </button>
+            }
+          </div>
+          @if (plazoMeses.invalid && plazoMeses.touched) {
+            <span class="error-campo">
+              @if (plazoMeses.hasError('required')) {
+                El plazo es obligatorio
+              } @else if (plazoMeses.hasError('pattern')) {
+                El plazo debe ser un número entero de meses
+              } @else {
+                El plazo debe estar entre 1 y {{ plazoMaximo }} meses
+              }
+            </span>
+          }
+        </div>
+
+        <button type="submit" class="btn btn--primario btn--bloque" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="spinner" aria-hidden="true"></span> Enviando...
+          } @else {
+            Solicitar
+          }
+        </button>
+      </form>
+    </section>
+
+    <section class="tarjeta">
+      <div class="encabezado-lista">
+        <h2 class="tarjeta__titulo">Mis préstamos</h2>
+        <button
+          type="button"
+          class="btn btn--fantasma btn--sm"
+          (click)="cargar()"
+          [disabled]="estadoCarga() === 'cargando'"
+        >
+          Actualizar
+        </button>
+      </div>
+
+      @if (estadoCarga() === 'error') {
+        <div class="estado-vacio">
+          <span class="icono" aria-hidden="true">⚠️</span>
+          No se pudieron cargar tus préstamos.
+          <div class="reintentar">
+            <button type="button" class="btn btn--fantasma btn--sm" (click)="cargar()">Reintentar</button>
+          </div>
+        </div>
+      } @else if (estadoCarga() === 'cargando' && prestamos().length === 0) {
+        <div aria-busy="true" aria-label="Cargando préstamos">
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+          <div class="skeleton"></div>
+        </div>
+      } @else if (prestamos().length === 0) {
+        <div class="estado-vacio">
+          <span class="icono" aria-hidden="true">📄</span>
+          Todavía no has solicitado ningún préstamo.
+        </div>
+      } @else {
+        <ul class="lista-prestamos">
+          @for (prestamo of prestamos(); track prestamo.id) {
+            <li class="item">
+              <div>
+                <div class="item__monto">{{ prestamo.monto | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</div>
+                <div class="item__detalle">
+                  {{ prestamo.plazoMeses }} {{ prestamo.plazoMeses === 1 ? 'mes' : 'meses' }} ·
+                  {{ prestamo.solicitadoEn | date: 'mediumDate' }}
+                </div>
+              </div>
+              <app-etiqueta-estado [estado]="prestamo.estado" />
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+</main>

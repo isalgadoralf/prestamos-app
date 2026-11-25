@@ -1,0 +1,95 @@
+<div class="pagina-login">
+  <aside class="panel-marca">
+    <div class="marca">
+      <span class="logo" aria-hidden="true">$</span>
+      <span>Préstamos</span>
+    </div>
+    <div>
+      <h2>Tu crédito, claro y a tiempo.</h2>
+      <p>Solicita un préstamo en segundos y sigue su estado en tiempo real.</p>
+    </div>
+    <small>© 2026 · Prueba técnica</small>
+  </aside>
+
+  <main class="zona-formulario">
+    <form class="tarjeta tarjeta-login" [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+      <h1 class="tarjeta__titulo">Iniciar sesión</h1>
+      <p class="tarjeta__subtitulo">Ingrese sus credenciales para acceder</p>
+
+      @if (mensajeError()) {
+        <div class="alerta alerta--error" role="alert">{{ mensajeError() }}</div>
+      }
+
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <input
+          id="correo"
+          class="entrada"
+          type="email"
+          formControlName="correo"
+          placeholder="nombre@correo.com"
+          autocomplete="username"
+          [attr.aria-invalid]="correo.invalid && correo.touched"
+          aria-describedby="correo-error"
+        />
+        @if (correo.invalid && correo.touched) {
+          <span id="correo-error" class="error-campo">
+            @if (correo.hasError('required')) {
+              El correo es obligatorio
+            } @else if (correo.hasError('email')) {
+              Formato de correo inválido
+            } @else {
+              El correo es demasiado largo
+            }
+          </span>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="contrasena">Contraseña</label>
+        <div class="con-accion">
+          <input
+            id="contrasena"
+            class="entrada"
+            [type]="mostrarContrasena() ? 'text' : 'password'"
+            formControlName="contrasena"
+            placeholder="••••••"
+            autocomplete="current-password"
+            [attr.aria-invalid]="contrasena.invalid && contrasena.touched"
+            aria-describedby="contrasena-error"
+          />
+          <button
+            type="button"
+            class="ver"
+            (click)="mostrarContrasena.set(!mostrarContrasena())"
+            [attr.aria-label]="mostrarContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          >
+            {{ mostrarContrasena() ? 'Ocultar' : 'Ver' }}
+          </button>
+        </div>
+        @if (contrasena.invalid && contrasena.touched) {
+          <span id="contrasena-error" class="error-campo">La contraseña es obligatoria</span>
+        }
+      </div>
+
+      <button type="submit" class="btn btn--primario btn--bloque" [disabled]="cargando()">
+        @if (cargando()) {
+          <span class="spinner" aria-hidden="true"></span> Ingresando...
+        } @else {
+          Ingresar
+        }
+      </button>
+
+      <div class="demo">
+        <span>Cuentas de prueba</span>
+        <div class="demo__botones">
+          @for (cuenta of cuentasDemo; track cuenta.correo) {
+            <button type="button" class="btn btn--fantasma btn--sm" (click)="usarCuenta(cuenta)">
+              {{ cuenta.etiqueta }}
+            </button>
+          }
+        </div>
+      </div>
+    </form>
+  </main>
+</div>

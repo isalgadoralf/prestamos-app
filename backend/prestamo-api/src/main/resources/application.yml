@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: prestamos-api
+
+  datasource:
+    url: jdbc:h2:mem:prestamodb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  cache:
+    type: jcache
+    jcache:
+      config: classpath:ehcache.xml
+
+app:
+  jwt:
+    secreto: e32rZLWRlNe9opFg1sbskUwpPaWiRu1XyiF/8OiRdSt+fGIKAKss3kbkkGxh44sS
+    expiracion-minutos: 60

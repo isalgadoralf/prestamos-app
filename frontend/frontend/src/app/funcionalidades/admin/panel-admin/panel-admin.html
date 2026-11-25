@@ -1,0 +1,145 @@
+<app-barra-superior />
+
+<main class="contenedor">
+  <section class="metricas" aria-label="Resumen de solicitudes">
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Por revisar</div>
+      <div class="valor valor--aviso">{{ resumen().PENDIENTE }}</div>
+    </div>
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Aprobados</div>
+      <div class="valor">{{ resumen().APROBADO }}</div>
+    </div>
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Rechazados</div>
+      <div class="valor">{{ resumen().RECHAZADO }}</div>
+    </div>
+    <div class="tarjeta metrica">
+      <div class="etiqueta">Monto aprobado</div>
+      <div class="valor">{{ montoAprobado() | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</div>
+    </div>
+  </section>
+
+  <section class="tarjeta">
+    <div class="encabezado">
+      <div>
+        <h1 class="tarjeta__titulo">Gestionar solicitudes de préstamos</h1>
+        <p class="tarjeta__subtitulo">Aprueba o rechaza las solicitudes pendientes</p>
+      </div>
+      <button
+        type="button"
+        class="btn btn--fantasma btn--sm"
+        (click)="cargar()"
+        [disabled]="estadoCarga() === 'cargando'"
+      >
+        Actualizar
+      </button>
+    </div>
+
+    <div class="herramientas">
+      <div class="pestanas" role="tablist" aria-label="Filtrar por estado">
+        @for (f of filtros; track f.valor) {
+          <button
+            type="button"
+            role="tab"
+            class="pestana"
+            [class.pestana--activa]="filtro() === f.valor"
+            [attr.aria-selected]="filtro() === f.valor"
+            (click)="filtro.set(f.valor)"
+          >
+            {{ f.texto }} <span class="contador">{{ conteo(f.valor) }}</span>
+          </button>
+        }
+      </div>
+      <label class="sr-only" for="buscar">Buscar por correo</label>
+      <input
+        id="buscar"
+        class="entrada buscador"
+        type="search"
+        placeholder="Buscar por correo…"
+        [value]="busqueda()"
+        (input)="alBuscar($event)"
+      />
+    </div>
+
+    @if (estadoCarga() === 'error') {
+      <div class="estado-vacio">
+        <span class="icono" aria-hidden="true">⚠️</span>
+        No se pudieron cargar las solicitudes.
+        <div class="reintentar">
+          <button type="button" class="btn btn--fantasma btn--sm" (click)="cargar()">Reintentar</button>
+        </div>
+      </div>
+    } @else if (estadoCarga() === 'cargando' && prestamosVisibles().length === 0) {
+      <div aria-busy="true" aria-label="Cargando solicitudes">
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+        <div class="skeleton"></div>
+      </div>
+    } @else if (prestamosVisibles().length === 0) {
+      <div class="estado-vacio">
+        <span class="icono" aria-hidden="true">✅</span>
+        @if (busqueda()) {
+          Ninguna solicitud coincide con “{{ busqueda() }}”.
+        } @else if (filtro() === 'PENDIENTE') {
+          No hay solicitudes pendientes por revisar.
+        } @else {
+          No hay solicitudes en esta categoría.
+        }
+      </div>
+    } @else {
+      <ul class="lista">
+        @for (prestamo of prestamosVisibles(); track prestamo.id) {
+          <li class="fila">
+            <div class="fila__usuario">
+              <span class="avatar" aria-hidden="true">{{ correoDe(prestamo.usuarioId).charAt(0) }}</span>
+              <div>
+                <div class="correo">{{ correoDe(prestamo.usuarioId) }}</div>
+                <div class="detalle">#{{ prestamo.id }} · {{ prestamo.solicitadoEn | date: 'medium' }}</div>
+              </div>
+            </div>
+
+            <div class="fila__monto">
+              <div class="monto">{{ prestamo.monto | currency: 'COP' : 'symbol-narrow' : '1.0-2' }}</div>
+              <div class="detalle">{{ prestamo.plazoMeses }} {{ prestamo.plazoMeses === 1 ? 'mes' : 'meses' }}</div>
+            </div>
+
+            <app-etiqueta-estado [estado]="prestamo.estado" />
+
+            <div class="fila__acciones">
+              @if (prestamo.estado === 'PENDIENTE') {
+                @if (confirmandoRechazoId() === prestamo.id) {
+                  <span class="pregunta">¿Rechazar?</span>
+                  <button type="button" class="btn btn--peligro btn--sm" (click)="rechazar(prestamo)">Sí</button>
+                  <button type="button" class="btn btn--fantasma btn--sm" (click)="cancelarRechazo()">No</button>
+                } @else {
+                  <button
+                    type="button"
+                    class="btn btn--primario btn--sm"
+                    [disabled]="procesandoId() === prestamo.id"
+                    (click)="aprobar(prestamo)"
+                  >
+                    @if (procesandoId() === prestamo.id) {
+                      <span class="spinner" aria-hidden="true"></span>
+                    }
+                    Aprobar
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn--peligro btn--sm"
+                    [disabled]="procesandoId() === prestamo.id"
+                    (click)="pedirRechazo(prestamo)"
+                  >
+                    Rechazar
+                  </button>
+                }
+              } @else if (prestamo.decididoEn) {
+                <span class="detalle">Decidido {{ prestamo.decididoEn | date: 'short' }}</span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+</main>

@@ -1,0 +1,62 @@
+# ===== IDEs / herramientas =====
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.vscode/
+!.vscode/extensions.json
+.claude/
+*.code-workspace
+.project
+.classpath
+.settings/
+.factorypath
+.sts4-cache/
+nbproject/
+
+# ===== Backend (Spring Boot - Maven/Gradle) =====
+target/
+!.mvn/wrapper/maven-wrapper.jar
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+.gradle/
+HELP.md
+*.class
+*.jar
+!**/gradle/wrapper/gradle-wrapper.jar
+!.mvn/wrapper/*.jar
+
+# ===== Frontend (Angular) =====
+node_modules/
+dist/
+.angular/
+.sass-cache/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm/
+.eslintcache
+
+# ===== Temporales / logs =====
+tmp/
+temp/
+*.tmp
+*.temp
+*.swp
+*.bak
+logs/
+*.log
+
+# ===== Variables de entorno =====
+.env
+.env.*
+!.env.example
+
+# ===== Sistema operativo =====
+.DS_Store
+Thumbs.db
+desktop.ini
